@@ -10,7 +10,7 @@ fn main() -> io::Result<()> {
         buffer
     };
 
-    let col: usize = std::env::args()
+    let col: isize = std::env::args()
         .nth(1)
         .expect("no col specified")
         .parse()
@@ -55,15 +55,26 @@ fn main() -> io::Result<()> {
         table.push(tmp_row.drain(..).collect());
     }
 
-    let out: String =
-        table
-            .iter()
-            .filter_map(|row| row.get(col - 1))
-            .fold(String::new(), |mut acc, x| {
-                acc.push_str(&x);
-                acc.push('\n');
-                acc
-            });
+    let out: String = table
+        .iter()
+        .filter_map(|row| {
+            let idx = if col > 0 {
+                col - 1
+            } else {
+                let idx = col + row.len() as isize - 1;
+                if idx < 0 {
+                    return None;
+                } else {
+                    idx
+                }
+            };
+            row.get(idx as usize)
+        })
+        .fold(String::new(), |mut acc, x| {
+            acc.push_str(&x);
+            acc.push('\n');
+            acc
+        });
 
     write!(io::stdout(), "{}", out)?;
     io::stdout().flush()?;
