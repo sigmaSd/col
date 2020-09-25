@@ -48,10 +48,14 @@ fn main() -> io::Result<()> {
     }
 
     //leftover
-    tmp_row.push(tmp_str.drain(..).collect());
-    table.push(tmp_row.drain(..).collect());
+    if !tmp_str.is_empty() {
+        tmp_row.push(tmp_str.drain(..).collect());
+    }
+    if !tmp_row.is_empty() {
+        table.push(tmp_row.drain(..).collect());
+    }
 
-    let mut out: String =
+    let out: String =
         table
             .iter()
             .filter_map(|row| row.get(col - 1))
@@ -60,8 +64,6 @@ fn main() -> io::Result<()> {
                 acc.push('\n');
                 acc
             });
-    out.pop();
-    let out = out;
 
     write!(io::stdout(), "{}", out)?;
     io::stdout().flush()?;
